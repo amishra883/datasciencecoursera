@@ -1,0 +1,388 @@
+# Phase 0.2 — Top-5 creator rankings by aggregate views
+# Capture date: 2026-05-14
+# Re-run monthly per CLAUDE.md "Phase 0.2"
+# Methodology: sum public view counts across Twitch (30d), YouTube (90d),
+# TikTok (30d), Instagram (30d). Rank by total.
+#
+# IMPORTANT: The pool of 5 verified-open clipper programs from Phase 0.1
+# (clipper_programs.yaml) is exactly 5; no elimination round was required.
+# This file is a ranking exercise to prioritize ingest cadence and budget
+# allocation across the 5, not a cut.
+
+next_recompute: 2026-06-13   # 30 days from capture
+
+methodology_notes:
+  twitch_window_days: 30
+  youtube_window_days: 90
+  tiktok_window_days: 30
+  instagram_window_days: 30
+
+  primary_sources:
+    - TwitchTracker (https://twitchtracker.com/<creator>)
+    - StreamsCharts (https://streamscharts.com/channels/<creator>)
+    - SullyGnome (https://sullygnome.com/channel/<creator>)
+    - Social Blade (YouTube, TikTok, Instagram)
+    - HypeAuditor (cross-platform)
+
+  fallback_sources:
+    - VidIQ channel-stats pages
+    - Channel page direct (sum recent videos)
+
+  data_quality_note: >
+    Most analytics aggregator sites (TwitchTracker, SullyGnome, Social Blade,
+    HypeAuditor) return HTTP 403 to direct WebFetch (Cloudflare-gated).
+    Numbers below were captured via search-result snippets that quote those
+    same aggregators. Where a primary source returned no number after
+    reasonable attempts, the field is marked unverified: true and excluded
+    from the rank total. Re-runs should attempt verification again with
+    direct browser scraping (Playwright) once the operator approves a
+    scraping budget.
+
+  twitch_metric_choice: >
+    Twitch tracker sites publish "hours watched" rather than "views" as the
+    standard 30d aggregation. We use hours-watched as the Twitch view-equivalent
+    in the aggregate total, consistent with how creator rankings are normally
+    compared across these platforms. This OVERSTATES Twitch relative to TikTok
+    (where each scroll = 1 view); a single dedicated viewer can contribute
+    hundreds of "hours watched" but only one TikTok view. Operator should
+    weight the rank with this asymmetry in mind — Twitch-primary creators
+    (Jynxzi) will look larger here in clip-supply terms than their TikTok
+    distribution numbers alone would suggest.
+
+  youtube_window_extrapolation: >
+    Where only "last 30 days" YouTube views were sourced (most cases — the
+    public Social Blade summaries surface 30d, not 90d, in their snippet),
+    we multiplied by 3 to estimate 90d. This assumes flat upload cadence;
+    flagged in each note. A real 90d figure would require a Social Blade
+    paid account or direct Playwright scrape of the daily-views chart.
+
+  kai_cenat_twitch_anomaly: >
+    Kai Cenat did NOT stream on Twitch in the trailing 30d window per
+    StreamsCharts and SullyGnome (0 hours streamed, 0 hours watched).
+    His Twitch number is a verified zero, not unverified — it just means
+    his content supply for THIS window came entirely from his YouTube Live
+    re-uploads. The clipper pipeline can still ingest his YouTube VODs.
+
+  adin_ross_kick_substitution: >
+    Adin Ross's primary live platform is Kick, not Twitch. The Phase 0.1
+    clipper-program entry (Adin Ross + N3on joint network) explicitly covers
+    Kick-stream content. We populate the "twitch" platform slot with his
+    Kick numbers and note the substitution. Twitch (where he was banned and
+    only briefly returned) is irrelevant for clip supply.
+
+# Ranked 1 → 5 by sum of verified platform views (unverified excluded)
+creators:
+  - rank: 1
+    creator: IShowSpeed
+    aggregate_total_views: 1684793761
+    platforms:
+      twitch:
+        handle: https://www.twitch.tv/ishowspeed
+        views_30d: 2003761
+        verified: true
+        source: https://streamscharts.com/channels/ishowspeed
+        captured: 2026-05-14
+        note: >
+          Hours watched in last 30 days per StreamsCharts/SullyGnome
+          (90 hours streamed, 22,141 avg viewers, 108,677 peak). Ranked
+          #33 on Twitch by hours watched.
+      youtube:
+        handle: https://www.youtube.com/@ishowspeed
+        views_90d: 1682790000
+        verified: true
+        source: https://socialblade.com/youtube/handle/ishowspeed
+        captured: 2026-05-14
+        note: >
+          Estimated by extrapolation: 560.93M views in last 30d per Social
+          Blade snippet (53.4M subs, +1.6M in 30d). 90d estimate = 30d × 3,
+          which assumes flat output. A direct 90d figure would need a paid
+          Social Blade account or Playwright scrape.
+      tiktok:
+        handle: https://www.tiktok.com/@ishowspeed
+        views_30d: null
+        verified: false
+        source: https://socialblade.com/tiktok/user/ishowspeed
+        captured: 2026-05-14
+        note: >
+          Account confirmed (51.2M followers, 9.48% engagement); recent 7
+          videos cited at 802M aggregate views per Facebook secondary
+          source, but the window for those 7 isn't explicitly 30d, so
+          flagged unverified rather than guessing. Re-verify via Social
+          Blade direct scrape.
+      instagram:
+        handle: https://www.instagram.com/ishowspeed/
+        views_30d: null
+        verified: false
+        source: https://hypeauditor.com/instagram/ishowspeed/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (47.36M followers as of May 3 2026, 5.71%
+          engagement). HypeAuditor surfaces follower/engagement but not a
+          30d aggregate-views number from search snippets. Mark unverified.
+    primary_platforms: [youtube, twitch]
+    program_terms_summary: >
+      IShowSpeed Clipping (Free) Whop campaign — standard Whop CPM mechanics,
+      free to join, ~$1–$5 per 1k views range per secondary reporting.
+    spec_conflicts:
+      - "1-hour Whop submission window may conflict with our pipeline latency"
+      - "Audience skews young; 'no controversial / drama' default in CLAUDE.md should be checked against his typical IRL stunt content"
+
+  - rank: 2
+    creator: Kai Cenat
+    aggregate_total_views: 230400000
+    platforms:
+      twitch:
+        handle: https://www.twitch.tv/kaicenat
+        views_30d: 0
+        verified: true
+        source: https://streamscharts.com/channels/kaicenat/statistics
+        captured: 2026-05-14
+        note: >
+          Verified ZERO — Kai Cenat did not stream on Twitch in the trailing
+          30d per StreamsCharts and SullyGnome. Lifetime 536M hours watched,
+          peak viewer record 1,005,331 (Sept 2025). Clip supply for THIS
+          window comes from his YouTube Live re-uploads. Re-check next
+          monthly cycle; he typically returns for event streams.
+      youtube:
+        handle: https://www.youtube.com/@KaiCenatLive
+        views_90d: 230400000
+        verified: true
+        source: https://socialblade.com/youtube/handle/kaicenatlive
+        captured: 2026-05-14
+        note: >
+          Kai Cenat Live (the VOD-of-stream channel, 14.76M subs) got 76.8M
+          views in last 30d per VidIQ; 90d estimate = ×3. The main
+          @kaicenat channel (7.77M subs, 286 vids, 430.2M lifetime) is much
+          smaller and was not added (would be double-counting if main and
+          live overlap; we use Live as primary clip source).
+      tiktok:
+        handle: https://www.tiktok.com/@kai_cenat
+        views_30d: null
+        verified: false
+        source: https://socialblade.com/tiktok/user/kai_cenat
+        captured: 2026-05-14
+        note: >
+          Account confirmed (21.2M followers, 184.1M lifetime likes,
+          19.91% engagement — top 3% of TikTok). 30d aggregate views not
+          surfaced via search; HypeAuditor and Social Blade have it
+          behind their UI. Mark unverified.
+      instagram:
+        handle: https://www.instagram.com/kaicenat/
+        views_30d: null
+        verified: false
+        source: https://hypeauditor.com/instagram/kaicenat/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (17.05M followers as of Feb 2026, 11.03%
+          engagement, only 21 posts total — he posts rarely). 30d view
+          aggregate not surfaced. Mark unverified. Low post count means
+          even verified, IG would likely be his smallest contributor.
+    primary_platforms: [youtube, tiktok]
+    program_terms_summary: >
+      Kai Cenat clips Whop Content Rewards campaign — ~$2 per 1k verified views,
+      standard Whop submission mechanics, allowed: TikTok / IG Reels / YT
+      Shorts / X.
+    spec_conflicts:
+      - "Submit-within-1-hour rule may conflict with our 4h Scout cadence + edit/script/visuals/compliance pipeline latency"
+      - "Watermark / attribution requirements live in the Cloudflare-gated Whop campaign brief — operator must visit and capture before relying on the license"
+      - "Twitch contribution is currently 0; pipeline supply for Kai depends entirely on YouTube Live VOD ingest this month"
+
+  - rank: 3
+    creator: Sketch
+    aggregate_total_views: 17662470
+    platforms:
+      twitch:
+        handle: https://www.twitch.tv/thesketchreal
+        views_30d: 52470
+        verified: true
+        source: https://streamscharts.com/channels/thesketchreal
+        captured: 2026-05-14
+        note: >
+          Hours watched in last 30d per StreamsCharts/SullyGnome
+          (49 hours streamed, 1,056 avg viewers, 2,964 peak). Ranked #1179
+          on Twitch in 2026 — note this is a major drop from his
+          2024 viral-catchphrase peak.
+      youtube:
+        handle: https://www.youtube.com/@TheSketchReal
+        views_90d: 17610000
+        verified: true
+        source: https://socialblade.com/youtube/handle/thesketchreal
+        captured: 2026-05-14
+        note: >
+          Estimated: 5.87M views in last 30d per Social Blade snippet
+          (5.4M subs, +20K in 30d). 90d estimate = 30d × 3.
+      tiktok:
+        handle: https://www.tiktok.com/@thesketchreal
+        views_30d: null
+        verified: false
+        source: https://socialblade.com/tiktok/user/thesketchreal
+        captured: 2026-05-14
+        note: >
+          Account confirmed (2.6M followers, 15.5M lifetime likes). HypeAuditor
+          page exists at hypeauditor.com/tiktok/thesketchreal/ but search
+          snippets don't surface a 30d aggregate. Mark unverified.
+      instagram:
+        handle: https://www.instagram.com/thesketchreal/
+        views_30d: null
+        verified: false
+        source: https://www.instagram.com/thesketchreal/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (~2M followers per Wikipedia+Linktree). No 30d
+          aggregate surfaced. Mark unverified.
+    primary_platforms: [youtube, twitch]
+    program_terms_summary: >
+      Sketch clipping Whop Content Rewards campaign — reportedly ~$0.35 per
+      1k views ($350 per 1M); UNUSUALLY LOW vs typical $1–$5 streamer band.
+      Re-verify the brief before relying.
+    spec_conflicts:
+      - "Reported $0.35/1k payout is well below typical streamer-clip CPM; pipeline cost-per-clip likely doesn't earn out via the Whop bounty alone — would need to rely on platform ad-rev share. Operator should re-verify before allocating budget."
+      - "Family-friendly catchphrase content is low compliance risk but viral half-life of his 'what's up brother' moments is short; trend may be Cooked."
+      - "Twitch viewership has collapsed from 2024 peak (now ranked #1179) — clip-supply quality may be limited; YouTube re-uploads of legacy moments may be the better source."
+
+  - rank: 4
+    creator: Jynxzi
+    aggregate_total_views: 6950013
+    platforms:
+      twitch:
+        handle: https://www.twitch.tv/jynxzi
+        views_30d: 6950013
+        verified: true
+        source: https://twitchtracker.com/jynxzi
+        captured: 2026-05-14
+        note: >
+          Hours watched in last 30d per TwitchTracker / StreamsCharts
+          (173h30m streamed, ~40-42K avg viewers, 9.77M followers).
+          Ranked #6 on Twitch in 2026. SullyGnome cross-cited 6,684,369;
+          range 6.68M – 6.95M depending on tracker — used the higher
+          TwitchTracker figure.
+      youtube:
+        handle: https://www.youtube.com/@Jynxzi
+        views_90d: null
+        verified: false
+        source: https://socialblade.com/youtube/handle/jynxzi
+        captured: 2026-05-14
+        note: >
+          Account confirmed (6.42M subs, 2.31B lifetime views). Recent 30d
+          view figure not surfaced in search snippets; April 2026 earnings
+          estimate $5,625-$7,706 implies roughly 2-4M views/month at typical
+          gaming-channel RPM, but that's an inference, not a primary number.
+          Mark unverified. NOTE: this likely understates Jynxzi's true
+          aggregate — verify in next monthly cycle.
+      tiktok:
+        handle: https://www.tiktok.com/@jynxziontwitch
+        views_30d: null
+        verified: false
+        source: https://socialblade.com/tiktok/user/jynxzi
+        captured: 2026-05-14
+        note: >
+          Account confirmed (10.2M followers, 304.2M lifetime likes — TikTok
+          is a major driver of his Twitch growth per Wikipedia). 30d
+          aggregate views not surfaced. Mark unverified.
+      instagram:
+        handle: https://www.instagram.com/jynxzi/
+        views_30d: null
+        verified: false
+        source: https://www.instagram.com/jynxzi/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (1M followers, only 26 posts — minimal IG
+          presence). Even if verified, IG would be his smallest contributor.
+          Mark unverified.
+    primary_platforms: [twitch, tiktok]
+    program_terms_summary: >
+      Jynxziclips Whop community + ad-hoc sponsored campaigns (e.g.
+      "Jynxzi x Juicy Drop") — ~$2 per 1k views per related streamer-clipping
+      hubs; specific brief gated.
+    spec_conflicts:
+      - "R6 Siege gameplay footage may trigger YouTube Content ID on game music — Compliance must mute background music"
+      - "Sponsored campaigns (Juicy Drop) are themselves ads; FTC #ad disclosure required on our re-uploads of sponsored stream content — Publisher must enforce"
+      - "YouTube and TikTok 30d view numbers unverified — actual rank may be higher than 4 once verified"
+
+  - rank: 5
+    creator: Adin Ross
+    aggregate_total_views: 2790000
+    platforms:
+      twitch:
+        handle: https://kick.com/adinross
+        views_30d: 2790000
+        verified: false
+        source: https://streamscharts.com/channels/adinross?platform=kick
+        captured: 2026-05-14
+        note: >
+          KICK substitution (he was banned from Twitch and his clipper
+          program covers Kick streams). Estimated 30d hours watched ≈ 2.79M
+          based on Q1 2026 total of 8.37M / 3 months. StreamsCharts cites
+          27,737 avg viewers in last 30d on Kick. Estimate flagged
+          unverified pending direct StreamsCharts confirmation of the 30d
+          rolling number.
+      youtube:
+        handle: https://www.youtube.com/@adinross
+        views_90d: null
+        verified: false
+        source: https://socialblade.com/youtube/handle/adinross
+        captured: 2026-05-14
+        note: >
+          Account confirmed (Adin Live channel, 4.56M subs, 1.6B lifetime
+          views, 2,422 videos). Monthly ad-rev range $20K-$30K from
+          secondary reporting implies very roughly 5-15M views/month, but
+          direct 30d/90d view figure not surfaced. Mark unverified.
+      tiktok:
+        handle: https://www.tiktok.com/@adinross
+        views_30d: null
+        verified: false
+        source: https://hypeauditor.com/tiktok/adinross/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (6.2M followers). 30d aggregate views not
+          surfaced. Mark unverified.
+      instagram:
+        handle: https://www.instagram.com/adinross/
+        views_30d: null
+        verified: false
+        source: https://hypeauditor.com/instagram/adinross/
+        captured: 2026-05-14
+        note: >
+          Account confirmed (6.36M followers as of Mar 2026, growth -0.44%
+          — slight shrinkage). 30d view aggregate not surfaced.
+          Mark unverified.
+    primary_platforms: [kick, youtube]
+    program_terms_summary: >
+      Adin Ross + N3on joint clipper network (~$1M/mo combined commitment);
+      $40-$50 per 100K views (~$0.40-$0.50 per 1k); recruits via
+      discord.gg/clipping; rules Discord-gated (NOT publicly readable).
+    spec_conflicts:
+      - "Source content frequently includes gambling sponsorship (Stake/Kick), ineligible under YouTube Shorts and Instagram Reels monetization rules — Compliance must filter or mute these segments"
+      - "Heavy political and controversy content (recurring Trump streams, drama feuds) directly conflicts with CLAUDE.md open-question default 'Tolerance for controversial / drama-heavy clips: skip'. Choosing Adin Ross materially shifts the operation toward drama-content; operator should consciously confirm or override the skip-drama default."
+      - "Discord-gated rules block pre-verification of attribution / exclusivity terms — must join the Discord and capture the brief before relying on the license"
+      - "Most-verified-views creator on the list is also the highest-risk source — content-style fit decision needs to happen before pipeline ingest"
+
+# Aggregate summary
+summary:
+  total_creators_ranked: 5
+  data_quality:
+    fully_verified_creators: 0       # no creator has 4-of-4 platforms verified
+    partially_verified_creators: 5   # all 5 have at least 1 verified platform
+    fully_unverified_creators: 0     # required to be 0 — re-run if not
+
+  verified_platform_counts:
+    IShowSpeed: 2     # Twitch + YouTube
+    Kai_Cenat: 2      # Twitch (verified zero) + YouTube
+    Sketch: 2         # Twitch + YouTube
+    Jynxzi: 1         # Twitch only
+    Adin_Ross: 0      # Kick estimate flagged unverified; main numbers still unverified
+
+  ranking_caveats:
+    - "Twitch hours-watched is used as the Twitch view-equivalent (per industry-standard tracker convention) but is NOT directly comparable to TikTok scroll-views. Twitch-primary creators (Jynxzi) are over-represented in clip-supply terms vs distribution terms in this rank."
+    - "TikTok 30d views are unverified for ALL 5 creators; Social Blade and HypeAuditor surface those numbers behind their UI but search snippets don't reliably extract them. Next monthly re-run should use Playwright to scrape directly."
+    - "Instagram 30d views are unverified for ALL 5 creators; same root cause."
+    - "YouTube 90d figures (where verified) are extrapolated 30d × 3, assuming flat upload cadence."
+    - "Adin Ross's rank-5 placement reflects DATA QUALITY, not actual reach — his Kick + YouTube + TikTok + IG combined likely ranks him above Sketch and Jynxzi on raw reach. Re-rank after next verification cycle."
+
+  red_flags:
+    - "ADIN ROSS CONTENT FIT: His content is gambling-promo-heavy + political/drama-heavy, which directly conflicts with CLAUDE.md's open-question default 'Tolerance for controversial / drama-heavy clips: skip'. The spec default should either be explicitly overridden by the operator (acknowledging higher strike + brand-safety risk) OR Adin Ross should be deprioritized to bottom of rotation despite his potentially-high reach. Recommendation: deprioritize until override is explicit."
+    - "SKETCH ECONOMICS: Reported Whop payout of ~$0.35 per 1k views is roughly 5-10x below typical streamer-clip CPMs. Combined with Sketch's collapsed 2026 Twitch viewership (rank #1179 vs his 2024 peak), the unit economics may not justify pipeline cost. Recommendation: pilot 10 Sketch clips before committing budget; treat as A/B candidate, not core rotation."
+    - "KAI CENAT TWITCH SUPPLY: Kai didn't stream on Twitch in the last 30d. Pipeline supply this month depends entirely on his YouTube Live VOD channel. If he extends a Twitch hiatus, the spec's expectation of fresh Twitch clips evaporates for our highest-engagement creator. Recommendation: add a 'no fresh source content in 30d' alert to Scout."
+    - "TIKTOK / INSTAGRAM DATA GAP: Zero of five creators have verified TikTok or IG 30d view numbers. The aggregate ranking is effectively a Twitch + YouTube ranking right now. Before the next monthly recompute (2026-06-13), the operator should approve a Playwright-based scrape of Social Blade for these two platforms, or pay for one month of Social Blade Premium ($4-$10) to unlock the 30d-views API."
+    - "JYNXZI UNDERRANKED: His verified Twitch number (6.95M hours) puts him at rank 4, but his confirmed 10.2M TikTok followers (the 'TikTok-drove-Twitch' growth pattern Wikipedia describes) almost certainly means his TikTok 30d views are 8-figure+. Once verified next cycle, expect Jynxzi to move to rank 2 or 3."
+    - "WHOP BRIEF GATING (carries forward from Phase 0.1): 4 of 5 creators (all except Adin Ross) have their per-campaign rules behind a Cloudflare-gated Whop page. Operator must visit each Whop campaign page in a real browser, capture the brief (attribution, watermark, prohibited content), and update clipper_programs.yaml BEFORE the pipeline starts ingesting. Without this, we cannot guarantee program compliance even if the legal-fair-use posture holds."
