@@ -1,0 +1,215 @@
+"""Publisher — flushes the publish queue, respecting the posting schedule.
+
+Reads `clips_ready` where status='queued' and scheduled_for <= now. Routes
+each row to its target platform (YouTube Data API v3, TikTok Content Posting
+API w/ Playwright fallback, Instagram Graph API). Builds the description from
+a template that includes:
+  - source creator name (attribution — fair-use Factor 1)
+  - "commentary" / "reaction" marker (transformative-purpose disclosure)
+  - "AI-generated visuals" disclosure if any generated assets were used
+  - "#ad" disclosure if affiliate links are present
+
+Live API integrations are deferred to Phase 2.
+
+Per CLAUDE.md "Architecture / Agent topology" — Publisher step 8.
+"""
+
+from __future__ import annotations
+
+import json
+from datetime import datetime, timezone
+
+from agents.config import load
+from agents.db import connect
+from agents.events import log
+
+
+# ---------- Platform-upload stubs ----------
+
+async def _upload_youtube_shorts(*, video_path: str, title: str, description: str,
+                                 hashtags: list[str], account_id: str) -> str:
+    # TODO(phase2): wire YouTube Data API v3 videos.insert (resumable upload).
+    # Needs: OAuth refresh token per account_id; title must include "#Shorts"
+    # per posting_schedule.yaml.reformatting.youtube_shorts.title_must_contain.
+    # Quota: 1600 units/upload; daily cap 10000 (cap to 6 uploads/day).
+    raise NotImplementedError("live mode not implemented in Phase 1 scaffold")
+
+
+async def _upload_tiktok(*, video_path: str, title: str, description: str,
+                         hashtags: list[str], account_id: str) -> str:
+    # TODO(phase2): wire TikTok Content Posting API (SELF_ONLY pre-audit mode).
+    # Fallback: Playwright against TikTok Studio Desktop if API access is denied
+    # (posting_schedule.yaml.quota_guards.tiktok.fallback).
+    raise NotImplementedError("live mode not implemented in Phase 1 scaffold")
+
+
+async def _upload_instagram_reels(*, video_path: str, title: str, description: str,
+                                  hashtags: list[str], account_id: str) -> str:
+    # TODO(phase2): wire Instagram Graph API two-step (create media container,
+    # then publish). Needs: long-lived page token; account_id mapped to IG
+    # business account id.
+    raise NotImplementedError("live mode not implemented in Phase 1 scaffold")
+
+
+_DISPATCH = {
+    "youtube_shorts": _upload_youtube_shorts,
+    "tiktok": _upload_tiktok,
+    "instagram_reels": _upload_instagram_reels,
+}
+
+
+# ---------- Description template ----------
+
+def build_description(
+    *,
+    creator: str,
+    visuals_used: bool,
+    affiliate_present: bool,
+    user_description: str = "",
+) -> str:
+    """Compose the final description. Compliance verifies the markers below."""
+    parts: list[str] = []
+    parts.append(f"Commentary on {creator}.")             # attribution + transformative marker
+    if visuals_used:
+        parts.append("Includes AI-generated visuals.")    # AI-content label
+    if affiliate_present:
+        parts.append("#ad")                               # FTC disclosure
+    if user_description:
+        parts.append(user_description)
+    return "\n".join(parts)
+
+
+# ---------- Queue helpers ----------
+
+def _pick_next_clip() -> dict | None:
+    """Return the next clip due to post. Locks via status='posting' so concurrent
+    Publisher invocations don't double-fire."""
+    with connect() as conn:
+        row = conn.execute(
+            """
+            SELECT * FROM clips_ready
+             WHERE status = 'queued'
+               AND scheduled_for <= datetime('now')
+             ORDER BY scheduled_for ASC
+             LIMIT 1
+            """
+        ).fetchone()
+        if row is None:
+            return None
+        conn.execute(
+            "UPDATE clips_ready SET status = 'posting' WHERE id = ?", (row["id"],)
+        )
+    return dict(row)
+
+
+def _mark_posted(row_id: int, platform_post_id: str) -> None:
+    with connect() as conn:
+        conn.execute(
+            """
+            UPDATE clips_ready
+               SET status = 'posted',
+                   platform_post_id = ?,
+                   posted_at = datetime('now')
+             WHERE id = ?
+            """,
+            (platform_post_id, row_id),
+        )
+
+
+def _mark_failed(row_id: int, reason: str) -> None:
+    with connect() as conn:
+        conn.execute(
+            """
+            UPDATE clips_ready
+               SET status = 'failed',
+                   failure_reason = ?,
+                   retry_count = retry_count + 1
+             WHERE id = ?
+            """,
+            (reason, row_id),
+        )
+
+
+def _artifact_for(clip_id: str) -> dict:
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT * FROM clip_artifacts WHERE clip_id = ?", (clip_id,)
+        ).fetchone()
+    return dict(row) if row else {}
+
+
+def _creator_for(clip_id: str) -> str:
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT creator FROM clips_candidate WHERE id = ?", (clip_id,)
+        ).fetchone()
+    return row["creator"] if row else "unknown"
+
+
+# ---------- Public entry point ----------
+
+async def run_publisher() -> None:
+    """Flush the ready queue until empty or until the next clip's scheduled_for
+    is in the future. Each iteration posts at most one clip.
+    """
+    load("posting_schedule")  # surface config errors early; consumed by Phase 2 wiring
+
+    while True:
+        clip = _pick_next_clip()
+        if clip is None:
+            log(agent="publisher", event_type="queue_empty",
+                rationale="no clips due to post")
+            return
+
+        platform = clip["target_platform"]
+        clip_id = clip["clip_id"]
+        artifact = _artifact_for(clip_id)
+        creator = _creator_for(clip_id)
+        hashtags = json.loads(clip.get("hashtags_json") or "[]")
+        visuals_used = bool(artifact.get("visuals_seconds_used"))
+        # Affiliate detection is a placeholder — Phase 2 reads the affiliate
+        # tracker DB to determine whether a short link was attached.
+        affiliate_present = "#ad" in (clip.get("description") or "")
+
+        description = clip.get("description") or build_description(
+            creator=creator,
+            visuals_used=visuals_used,
+            affiliate_present=affiliate_present,
+        )
+
+        dispatch = _DISPATCH.get(platform)
+        if dispatch is None:
+            _mark_failed(clip["id"], f"unsupported_platform:{platform}")
+            log(agent="publisher", event_type="post_failed", level="error",
+                clip_id=clip_id, payload={"platform": platform},
+                rationale=f"no dispatch for target platform '{platform}'")
+            continue
+
+        try:
+            platform_post_id = await dispatch(
+                video_path=artifact.get("final_video_path") or "",
+                title=clip.get("title") or "",
+                description=description,
+                hashtags=hashtags,
+                account_id=clip["account_id"],
+            )
+        except NotImplementedError:
+            _mark_failed(clip["id"], "phase1_scaffold:live_upload_not_wired")
+            log(agent="publisher", event_type="phase1_scaffold",
+                clip_id=clip_id, payload={"platform": platform},
+                rationale="upload call stubbed in Phase 1; row marked failed for retry")
+            continue
+        except Exception as exc:  # pragma: no cover — defensive only
+            _mark_failed(clip["id"], f"upload_error:{exc!r}")
+            log(agent="publisher", event_type="post_failed", level="error",
+                clip_id=clip_id, payload={"platform": platform, "error": repr(exc)},
+                rationale="upload raised")
+            continue
+
+        _mark_posted(clip["id"], platform_post_id)
+        log(agent="publisher", event_type="post_published",
+            clip_id=clip_id,
+            payload={"platform": platform, "platform_post_id": platform_post_id,
+                     "account_id": clip["account_id"],
+                     "posted_at": datetime.now(timezone.utc).isoformat()},
+            rationale=f"posted to {platform} as {platform_post_id}")
