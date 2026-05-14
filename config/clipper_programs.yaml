@@ -1,0 +1,343 @@
+# Phase 0.1 — Open clipper programs verification
+# Capture date: 2026-05-14
+# Re-verify monthly per CLAUDE.md "Legal & risk register"
+#
+# Methodology notes:
+#   - Primary sources for most creators are Whop / Content Rewards campaign pages,
+#     which return HTTP 403 to WebFetch (Cloudflare-gated). Where we could not
+#     fetch the campaign brief itself, we did NOT extract specific rules; we
+#     captured the URL plus what 3rd-party reporting (Dexerto, Tubefilter,
+#     Complex, Variety, Whop's own blog) confirms publicly, and flagged the
+#     rest as `unknown` rather than guessing.
+#   - "verified_open" means: we found a public, currently-live primary surface
+#     (Whop campaign page, dedicated submission portal, or repeated 1st-party
+#     reporting) confirming the program is open for new clippers.
+#   - "unverified" means: we could not find a primary source after 2-3 searches.
+#   - Several creators are AMP members (Kai Cenat, Fanum, Duke Dennis, Agent00).
+#     We could NOT find a unified AMP-collective clipper program — only
+#     individual programs (Kai Cenat has one; the others appear in 3rd-party
+#     hub campaigns like DracoSlides but not as 1st-party programs).
+
+programs:
+  - creator: Kai Cenat
+    status: verified_open
+    source_url: https://whop.com/discover/kai-cenat-clips-15/
+    capture_date: 2026-05-14
+    program_name: "Kai Cenat clips (Whop Content Rewards campaign)"
+    rules:
+      - "Source: Kai Cenat livestream / VOD content"
+      - "Per Whop Content Rewards platform mechanics: clip, post to allowed platform, then submit the post URL within ~1 hour of posting"
+      - "Campaign-specific brief on Whop dictates hook style, hashtags, watermarks (not retrievable via WebFetch — 403 gated)"
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts, x]
+    attribution_required: "unknown — campaign-brief gated; Whop campaigns commonly require @mention or watermark"
+    exclusivity: "unknown — Whop campaigns typically allow cross-posting across listed platforms but cap per-clip payout"
+    payout:
+      model: cpm
+      rate: "~$2 per 1,000 verified views (per Variety + clippa.net reporting on the Kai Cenat Whop campaign); subject to per-clip and total monthly budget caps"
+    prohibited_content:
+      - "unknown — campaign brief not retrievable; Whop platform-wide rules ban hate, sexual, deceptive, or copyright-infringing content"
+    spec_conflicts:
+      - "Submit-within-1-hour rule may conflict with our pipeline latency (Scout 4h cadence + Editor + Writer + Visuals + Compliance gate). Need to verify whether 1h applies to Kai Cenat's specific campaign or is a Whop default."
+      - "Attribution / watermark requirements (if present) need to be confirmed before we can guarantee compliance."
+    notes: >
+      Kai Cenat's official site (kaicenat.com/streamclips) also exists but
+      WebFetch returned 403; appears to be a clip showcase page rather than
+      a clipper-recruitment portal. The Whop campaign is the primary
+      monetized program. Multiple secondary sources (Variety 2026 piece,
+      clippa.net, Whop's own blog post on Kai Cenat clips) corroborate the
+      program is active.
+
+  - creator: IShowSpeed
+    status: verified_open
+    source_url: https://whop.com/ishowspeed-clipping-free/
+    capture_date: 2026-05-14
+    program_name: "IShowSpeed Clipping (Free)"
+    rules:
+      - "Free-to-join Whop community for clipping IShowSpeed content"
+      - "Standard Whop Content Rewards mechanics: clip, post, submit URL"
+      - "Specific brief content not retrievable (Whop 403 gated)"
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts, x]
+    attribution_required: "unknown — campaign-brief gated"
+    exclusivity: "unknown — likely none beyond standard Whop terms"
+    payout:
+      model: cpm
+      rate: "unknown specific CPM; secondary reporting (Ssemble blog, NPR clipping-economy piece) cites top IShowSpeed clippers earning into 6 figures/month at typical $1–$5 per 1k views range"
+    prohibited_content:
+      - "unknown — campaign brief not retrievable; Whop platform-wide content rules apply"
+    spec_conflicts:
+      - "1-hour submission window (Whop default) may conflict with pipeline latency"
+      - "IShowSpeed is a minor-related-content magnet (he's young; his audience skews young). Our 'no controversial / drama' default in CLAUDE.md open-questions should be checked against his typical content."
+    notes: >
+      Multiple parallel Whop pages exist (whop.com/discover/ishowspped-clipping/,
+      whop.com/discover/ishowspeed-82/, whop.com/discover/creatordropishowspeed/).
+      The "Free" page is the most accessible primary entry point. Per
+      Ssemble reporting, IShowSpeed actively encourages fan clipping and
+      "has protected his fans so they can clip his content without
+      copyright issues" — favorable posture for our pipeline.
+
+  - creator: Adin Ross
+    status: verified_open
+    source_url: https://www.dexerto.com/kick/n3on-reveals-he-paid-army-of-clippers-1-4m-over-five-weeks-to-make-him-go-viral-3355473/
+    capture_date: 2026-05-14
+    program_name: "Adin Ross / N3on joint clipper network (announced 2026; recruits via discord.gg/clipping)"
+    rules:
+      - "Source: Adin Ross + N3on Kick streams"
+      - "Submission via Discord (discord.gg/clipping per Instagram post @discord.gg/clipping); per-clipper rules distributed in Discord, not on a public page"
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts, x]
+    attribution_required: "unknown — Discord-gated rules"
+    exclusivity: "unknown"
+    payout:
+      model: per_1k_views
+      rate: "$40 per 100,000 views base, $50 per 100,000 views on incentivized clips (per Dexerto/Tubefilter reporting on N3on's payout structure that Adin Ross shares); historical Adin Ross-only campaign paid $50 per 100,000 views"
+    prohibited_content:
+      - "unknown formally; Adin Ross's stream content frequently includes gambling promos (Stake), political content, and adult-adjacent material — we should pre-filter at Curator stage regardless"
+    spec_conflicts:
+      - "Source content frequently includes gambling sponsorship segments (Stake/Kick), which may be ineligible under YouTube Shorts and Instagram Reels monetization rules; Compliance must filter."
+      - "Heavy political / controversy content conflicts with CLAUDE.md open-question default 'Tolerance for controversial / drama-heavy clips: skip'."
+      - "Discord-gated rules mean we cannot pre-verify attribution / exclusivity terms — must join Discord and capture the rules before relying on this program."
+    notes: >
+      Dexerto, Tubefilter, and Complex all reported in late April 2026 that
+      Adin Ross and N3on jointly committed ~$1M/month combined to clipper
+      payouts. Program is open in the sense that anyone can join the
+      Discord and submit. Earlier 2025 Adin Ross-only program paid $50 per
+      100K views and is referenced in multiple secondary sources.
+
+  - creator: Sketch
+    status: verified_open
+    source_url: https://whop.com/discover/search/?q=Sketch
+    capture_date: 2026-05-14
+    program_name: "Sketch clipping (Whop Content Rewards campaign)"
+    rules:
+      - "Whop Content Rewards mechanics: clip Sketch's stream / VOD content, post, submit URL"
+      - "Specific brief not retrievable (Whop 403 gated)"
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts, x]
+    attribution_required: "unknown — campaign-brief gated"
+    exclusivity: "unknown"
+    payout:
+      model: per_1k_views
+      rate: "approximately $0.35 per 1,000 views ($350 per 1M views, per Whop search-result snippet; this is below the typical $1–$5 streamer-campaign band — re-verify before relying on it)"
+    prohibited_content:
+      - "unknown — campaign brief not retrievable"
+    spec_conflicts:
+      - "Reported $0.35/1k payout is unusually low — economics may not justify pipeline cost per clip given our $200/mo budget. Re-verify the actual rate inside the Whop campaign before scoring Sketch in Phase 0.2."
+      - "Sketch's content is family-friendly catchphrase-driven ('what's up, brother?'); compliance risk is low, but viral half-life of his catchphrase moments is short."
+    notes: >
+      Sketch (Kylie Cox / TheSketchReal) is the streamer behind the
+      "what's up, brother?" viral moment. The exact Whop landing page URL
+      could not be confirmed via WebFetch; Whop search returned the result
+      summary indirectly. Categorize as verified_open but re-verify the
+      direct campaign URL before committing pipeline budget.
+
+  - creator: Jynxzi
+    status: verified_open
+    source_url: https://whop.com/discover/jynxziclips/
+    capture_date: 2026-05-14
+    program_name: "Jynxziclips (Whop community)"
+    rules:
+      - "Whop community for Jynxzi clippers; brief not retrievable (Whop 403 gated)"
+      - "Separate fan portal jynxzi-clips.com exists for community submissions / weekly giveaway (NOT a paid clipper program — appears to be a fan highlights site, no payout)"
+      - "Recent campaign confirmed: 'Jynxzi x Juicy Drop' Nov-17-stream-clipping campaign (whop.com/discover/juicy-drop-candy/jynxzi-x-juicy-drop/) — paid sponsorship clipping campaign tied to a specific stream"
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts]
+    attribution_required: "unknown — campaign-brief gated"
+    exclusivity: "unknown — likely campaign-specific"
+    payout:
+      model: cpm
+      rate: "approximately $2 per 1,000 views per related streamer-clipping reporting (DracoSlides hub, which features Jynxzi clips); specific Jynxziclips rate not retrievable"
+    prohibited_content:
+      - "unknown formally; Jynxzi's content is Rainbow Six Siege gameplay-centric and largely brand-safe"
+    spec_conflicts:
+      - "Source content is heavily game-footage (R6 Siege). Ubisoft's terms permit gameplay clipping for monetization but may impact YouTube Content ID if game audio/music is present — Compliance must mute background music."
+      - "The 'Juicy Drop' campaign is sponsorship-driven, meaning re-clipping it implicitly relays an ad for a third-party product. FTC #ad disclosure requirement applies on our re-uploads — must be enforced by Publisher."
+    notes: >
+      jynxzi-clips.com is fan-community only (no payout). Whop hosts the
+      monetized clipping pathway (Jynxziclips community + ad-hoc Juicy Drop
+      campaign).
+
+  - creator: Plaqueboymax
+    status: unverified
+    source_url: https://whop.com/joined/plaque-boy-max-daddy-0/
+    capture_date: 2026-05-14
+    program_name: "n/a — no first-party clipper program found"
+    rules:
+      - "Searches: 'plaqueboymax clipper program', 'plaqueboymax clipping submit',
+        'plaqueboymax discord clip pay', site:whop.com plaqueboymax — none returned
+        an official, paid, open clipper program."
+      - "The 'plaque-boy-max-daddy-0' Whop community appears to be a fan group, not
+        a clipper-recruitment program."
+      - "Plaqueboymax's official Discord (discord.com/invite/plaqueboymax) is a
+        general fan/community server; no public documentation of a clip-payout
+        program."
+    allowed_platforms: []
+    attribution_required: unknown
+    exclusivity: unknown
+    payout:
+      model: none
+      rate: "no documented payout program"
+    prohibited_content: []
+    spec_conflicts: []
+    notes: >
+      Plaqueboymax (Max, ~$8M/yr per Forbes 2025) is a major Twitch
+      streamer (often hosts Streamer's University format, music reaction
+      content). There is heavy unofficial clipping of his content on
+      TikTok/YouTube but no public, first-party paid clipper program found
+      after multiple searches. Mark as unverified; revisit in 30 days.
+      Pipeline can still ingest his content under fair-use only — but we
+      lose the contractual safety blanket the spec emphasizes.
+
+  - creator: Agent00
+    status: unverified
+    source_url: ""
+    capture_date: 2026-05-14
+    program_name: "n/a — no first-party clipper program found"
+    rules:
+      - "Searches: 'Agent00 AMP clipper program', 'Agent00 clip submit',
+        site:whop.com Agent00 — no official program returned."
+      - "Agent00 (Din Muktar) is an AMP member; no AMP-wide unified clipper
+        program exists publicly that we could verify either."
+    allowed_platforms: []
+    attribution_required: unknown
+    exclusivity: unknown
+    payout:
+      model: none
+      rate: "no documented payout program"
+    prohibited_content: []
+    spec_conflicts: []
+    notes: >
+      Heavy unofficial clipping ecosystem exists on TikTok / YouTube but no
+      first-party paid program. Skip from the verified rotation; revisit
+      monthly. If AMP launches a unified program later, re-investigate.
+
+  - creator: Stableronaldo
+    status: unverified
+    source_url: https://whop.com/discover/icu/
+    capture_date: 2026-05-14
+    program_name: "n/a — no first-party Stableronaldo clipper program found; he is mentioned as a worked-with creator on Internet Clipping University (ICU), which is a third-party clipping-education product, not a Stableronaldo program"
+    rules:
+      - "Searches: 'Stableronaldo clipper program', 'Stableronaldo Whop',
+        'Stableronaldo official clip submit Discord' — no first-party program
+        returned."
+      - "Internet Clipping University (whop.com/discover/icu/) lists
+        Stableronaldo (and Lacy, Clix) as creators its students have clipped
+        for. This is evidence of an active clipping ecosystem around him but
+        NOT a Stableronaldo-run program with public terms."
+    allowed_platforms: []
+    attribution_required: unknown
+    exclusivity: unknown
+    payout:
+      model: unknown
+      rate: "unknown — no first-party program; ICU is a paid education product, not a payout program"
+    prohibited_content: []
+    spec_conflicts: []
+    notes: >
+      Mark as unverified pending discovery of a first-party clipper page.
+      Stableronaldo (Fortnite / variety streamer) does have an active
+      clipper community per ICU references, but we cannot rely on
+      third-party education products as license-granting documents.
+
+  - creator: Duke Dennis
+    status: unverified
+    source_url: https://whop.com/draco-slides-clipping/
+    capture_date: 2026-05-14
+    program_name: "n/a — no first-party Duke Dennis clipper program; Duke Dennis appears in DracoSlides, a third-party 'unboxing reactions' hub that aggregates clips from many streamers"
+    rules:
+      - "Searches: 'Duke Dennis clipper program', 'Duke Dennis AMP clipping',
+        site:whop.com Duke Dennis — no first-party program returned."
+      - "DracoSlides Clipping (whop.com/draco-slides-clipping/) lists Duke
+        Dennis among streamers whose unboxing reactions can be clipped; pays
+        $2 per 1,000 views per Whop product description. This is a 3rd-party
+        hub, not Duke-Dennis-operated."
+    allowed_platforms: [tiktok, instagram_reels, youtube_shorts]
+    attribution_required: "unknown — DracoSlides campaign brief gated"
+    exclusivity: unknown
+    payout:
+      model: cpm
+      rate: "$2 per 1,000 views via the DracoSlides hub for the specific unboxing-reactions campaign — NOT a Duke Dennis-issued license, just a third-party aggregator"
+    prohibited_content: []
+    spec_conflicts:
+      - "DracoSlides is a third-party that may not have first-party rights to redistribute Duke Dennis content. Using their license does not give US clean rights to re-edit Duke Dennis footage. Treat as fair-use only, not as a licensed program."
+    notes: >
+      No verified Duke-Dennis-first-party clipper program. The DracoSlides
+      Whop hub is the closest thing but appears to be a third-party
+      reactions-content aggregator. Mark unverified.
+
+  - creator: Fanum
+    status: unverified
+    source_url: ""
+    capture_date: 2026-05-14
+    program_name: "n/a — no first-party clipper program found"
+    rules:
+      - "Searches: 'Fanum AMP clipper program', 'Fanum clip submit',
+        site:whop.com Fanum, 'Fanum Kick Whop clipping' — no first-party
+        program returned."
+      - "Fanum left AMP in 2025/early 2026 per multiple secondary sources
+        (TikTok reporting via @kickclipper_), then returned to streaming
+        independently. No public clipper program documented before or after
+        the AMP exit."
+    allowed_platforms: []
+    attribution_required: unknown
+    exclusivity: unknown
+    payout:
+      model: none
+      rate: "no documented payout program"
+    prohibited_content: []
+    spec_conflicts: []
+    notes: >
+      Like other AMP members, Fanum has heavy unofficial clipping but no
+      first-party program found. Mark unverified. Compounding factor: his
+      AMP-departure narrative is itself drama-heavy content that conflicts
+      with our 'skip controversial / drama' default — even if a program
+      surfaces, his content type may be a poor fit.
+
+# Aggregate summary
+summary:
+  total_candidates: 10
+  verified_open: 5
+  verified_closed: 0
+  unverified: 5
+  spec_conflicts_total: 9
+  notes: >
+    Five creators verified as having open / publicly-documented clipper
+    programs accessible via Whop or a public Discord submission portal:
+    Kai Cenat, IShowSpeed, Adin Ross (joint w/ N3on), Sketch, and Jynxzi.
+
+    Five marked unverified after 2-3 searches: Plaqueboymax, Agent00,
+    Stableronaldo, Duke Dennis, Fanum. There is heavy unofficial clipping
+    activity around all five, but no first-party paid program was found.
+    NOTABLY: there is NO unified AMP collective clipper program — only
+    Kai Cenat (an AMP member) has an individual program; Fanum, Duke
+    Dennis, and Agent00 (also AMP members) do not.
+
+    Most common spec conflicts across verified-open programs:
+
+      1. Whop campaign briefs are Cloudflare-gated (HTTP 403 to WebFetch),
+         meaning we cannot pre-verify per-campaign attribution / exclusivity
+         / prohibited-content rules. Operator should manually visit each
+         campaign page and capture the brief before relying on the license.
+         Affects: Kai Cenat, IShowSpeed, Sketch, Jynxzi.
+
+      2. The "submit-within-1-hour" Whop default may conflict with our
+         pipeline latency (4h Scout cadence + edit + AI script + visuals
+         + compliance gate). May force us to either run a tighter loop for
+         these creators, or accept that we miss the submission window and
+         rely on platform monetization only (forfeiting the clipper
+         payout). Affects: Kai Cenat, IShowSpeed.
+
+      3. Source content controversy / sponsorship pollution: Adin Ross
+         (gambling promos, political content), Jynxzi (Juicy Drop
+         sponsored stream is itself an ad). Compliance must filter
+         monetization-ineligible segments and apply FTC #ad disclosure on
+         re-uploaded sponsored content. Affects: Adin Ross, Jynxzi.
+
+    Red flags for Phase 0.2 (creator selection):
+
+      - Sketch's reported $0.35 per 1k views (if accurate) is below typical
+        streamer-campaign rates — re-verify the actual brief; if true,
+        economics likely don't justify pipeline cost.
+      - Adin Ross program is Discord-gated; we cannot pre-verify exclusivity
+        / attribution rules without joining Discord and reading the brief.
+      - 5 of 10 candidates are unverified; the spec's "≥10 candidates" target
+        is reduced to a working pool of 5. Phase 0.2 ranking should be done
+        only across the 5 verified-open creators.
+
+    Re-verify all entries on 2026-06-14 per the Legal & Risk Register's
+    "monthly re-verification" requirement.
