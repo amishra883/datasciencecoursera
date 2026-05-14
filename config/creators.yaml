@@ -3,11 +3,28 @@
 # Re-run monthly per CLAUDE.md "Phase 0.2"
 # Methodology: sum public view counts across Twitch (30d), YouTube (90d),
 # TikTok (30d), Instagram (30d). Rank by total.
-#
-# IMPORTANT: The pool of 5 verified-open clipper programs from Phase 0.1
-# (clipper_programs.yaml) is exactly 5; no elimination round was required.
-# This file is a ranking exercise to prioritize ingest cadence and budget
-# allocation across the 5, not a cut.
+
+# === OPERATOR POSTURE (2026-05-14) ===
+# Fair-use-only — no clipper programs engaged. The operator has chosen to
+# rely solely on the fair-use defense documented in docs/fair_use_position.md
+# rather than enrolling in any creator's clipping program (Whop or otherwise).
+# Implications:
+#   - clipper_programs.yaml is informational only — DO NOT use program rules
+#     as a license shield. Compliance enforces fair-use rules, not program rules.
+#   - Curator selects clips purely on virality and projected profit, not
+#     program-compliance scoring.
+#   - Attribution in descriptions stays (it strengthens the Factor 4 / market-effect
+#     argument), but we are not bound by any program's specific attribution format.
+#   - "Sketch's weak Whop payout" concern dissolves — earnings come from
+#     platform ad-rev share on our channels, not Whop bounties.
+#   - "Whop brief capture" action item is dropped.
+#   - Strike-risk is higher than the program-licensed posture; the Compliance
+#     gate carries 100% of the legal-defense load. See fair_use_position.md.
+# =====================================
+
+# The top-5 ranking below is preserved from the verified-open pool of Phase 0.1
+# because the user approved the recommendation as-is. Re-rank from a wider pool
+# is a candidate for the 2026-06-13 monthly recompute if reach numbers warrant.
 
 next_recompute: 2026-06-13   # 30 days from capture
 
@@ -351,11 +368,24 @@ creators:
       Adin Ross + N3on joint clipper network (~$1M/mo combined commitment);
       $40-$50 per 100K views (~$0.40-$0.50 per 1k); recruits via
       discord.gg/clipping; rules Discord-gated (NOT publicly readable).
+    drama_override:
+      decision: accepted_2026-05-14
+      decided_by: operator
+      rationale: >
+        Operator explicitly overrode the CLAUDE.md "skip drama-heavy clips"
+        default for Adin Ross. He stays in the rotation with elevated
+        Compliance scrutiny (option (b) from phase0_digest.md Red Flag 1).
+        Other creators retain the default skip-drama posture.
+      enforcement:
+        - Compliance applies extra scrutiny on Adin Ross clips specifically
+        - Gambling-sponsorship segments still muted/cut (Shorts/Reels monetization gate)
+        - Defamation rules unchanged (no personal-attack content, opinion-framing required)
+        - If Adin-Ross-sourced clips draw more strikes than the cohort average
+          over any 30d window, pause his ingest pending operator review
     spec_conflicts:
       - "Source content frequently includes gambling sponsorship (Stake/Kick), ineligible under YouTube Shorts and Instagram Reels monetization rules — Compliance must filter or mute these segments"
-      - "Heavy political and controversy content (recurring Trump streams, drama feuds) directly conflicts with CLAUDE.md open-question default 'Tolerance for controversial / drama-heavy clips: skip'. Choosing Adin Ross materially shifts the operation toward drama-content; operator should consciously confirm or override the skip-drama default."
-      - "Discord-gated rules block pre-verification of attribution / exclusivity terms — must join the Discord and capture the brief before relying on the license"
-      - "Most-verified-views creator on the list is also the highest-risk source — content-style fit decision needs to happen before pipeline ingest"
+      - "Discord-gated program rules (no longer relevant under fair-use-only posture, but noted)"
+      - "Most-verified-views creator on the list is also the highest-risk source — content-style fit decision was made consciously by operator above"
 
 # Aggregate summary
 summary:
@@ -380,9 +410,9 @@ summary:
     - "Adin Ross's rank-5 placement reflects DATA QUALITY, not actual reach — his Kick + YouTube + TikTok + IG combined likely ranks him above Sketch and Jynxzi on raw reach. Re-rank after next verification cycle."
 
   red_flags:
-    - "ADIN ROSS CONTENT FIT: His content is gambling-promo-heavy + political/drama-heavy, which directly conflicts with CLAUDE.md's open-question default 'Tolerance for controversial / drama-heavy clips: skip'. The spec default should either be explicitly overridden by the operator (acknowledging higher strike + brand-safety risk) OR Adin Ross should be deprioritized to bottom of rotation despite his potentially-high reach. Recommendation: deprioritize until override is explicit."
-    - "SKETCH ECONOMICS: Reported Whop payout of ~$0.35 per 1k views is roughly 5-10x below typical streamer-clip CPMs. Combined with Sketch's collapsed 2026 Twitch viewership (rank #1179 vs his 2024 peak), the unit economics may not justify pipeline cost. Recommendation: pilot 10 Sketch clips before committing budget; treat as A/B candidate, not core rotation."
-    - "KAI CENAT TWITCH SUPPLY: Kai didn't stream on Twitch in the last 30d. Pipeline supply this month depends entirely on his YouTube Live VOD channel. If he extends a Twitch hiatus, the spec's expectation of fresh Twitch clips evaporates for our highest-engagement creator. Recommendation: add a 'no fresh source content in 30d' alert to Scout."
-    - "TIKTOK / INSTAGRAM DATA GAP: Zero of five creators have verified TikTok or IG 30d view numbers. The aggregate ranking is effectively a Twitch + YouTube ranking right now. Before the next monthly recompute (2026-06-13), the operator should approve a Playwright-based scrape of Social Blade for these two platforms, or pay for one month of Social Blade Premium ($4-$10) to unlock the 30d-views API."
-    - "JYNXZI UNDERRANKED: His verified Twitch number (6.95M hours) puts him at rank 4, but his confirmed 10.2M TikTok followers (the 'TikTok-drove-Twitch' growth pattern Wikipedia describes) almost certainly means his TikTok 30d views are 8-figure+. Once verified next cycle, expect Jynxzi to move to rank 2 or 3."
-    - "WHOP BRIEF GATING (carries forward from Phase 0.1): 4 of 5 creators (all except Adin Ross) have their per-campaign rules behind a Cloudflare-gated Whop page. Operator must visit each Whop campaign page in a real browser, capture the brief (attribution, watermark, prohibited content), and update clipper_programs.yaml BEFORE the pipeline starts ingesting. Without this, we cannot guarantee program compliance even if the legal-fair-use posture holds."
+    - "RESOLVED 2026-05-14 — ADIN ROSS CONTENT FIT: Operator overrode skip-drama default for Adin Ross only, with elevated Compliance scrutiny. See drama_override block in rank-5 entry."
+    - "PARTIALLY RESOLVED 2026-05-14 — SKETCH ECONOMICS: Whop-payout concern dissolves under fair-use-only posture (no program engagement). Remaining concern is his Twitch viewership collapse (rank #1179) which affects clip supply, not unit economics. Pilot-cadence approach still recommended; treat as A/B candidate, not core rotation."
+    - "OPEN — KAI CENAT TWITCH SUPPLY: Kai didn't stream on Twitch in the last 30d. Pipeline supply this month depends entirely on his YouTube Live VOD channel. If he extends a Twitch hiatus, the spec's expectation of fresh Twitch clips evaporates for our highest-engagement creator. Phase 1: add a 'no fresh source content in 30d' alert to Scout."
+    - "OPEN — TIKTOK / INSTAGRAM DATA GAP: Zero of five creators have verified TikTok or IG 30d view numbers. The aggregate ranking is effectively a Twitch + YouTube ranking right now. Before the next monthly recompute (2026-06-13), the operator should approve a Playwright-based scrape of Social Blade for these two platforms, or pay for one month of Social Blade Premium ($4-$10) to unlock the 30d-views API."
+    - "OPEN — JYNXZI UNDERRANKED: His verified Twitch number (6.95M hours) puts him at rank 4, but his confirmed 10.2M TikTok followers almost certainly means his TikTok 30d views are 8-figure+. Once verified next cycle, expect Jynxzi to move to rank 2 or 3."
+    - "RESOLVED 2026-05-14 — WHOP BRIEF GATING: Operator chose fair-use-only posture. No Whop engagement. clipper_programs.yaml is now informational only."

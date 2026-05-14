@@ -2,6 +2,36 @@
 
 > **Captured 2026-05-14. This is the single document the operator needs to read to decide whether to approve Phase 1 pipeline scaffolding.** Linked artifacts in `docs/` and `config/` carry the supporting detail.
 
+## Operator decisions resolved 2026-05-14
+
+| # | Red flag | Decision | Where written |
+|---|---|---|---|
+| 1 | Adin Ross drama conflict | **Override skip-drama default for Adin only**, with elevated Compliance scrutiny | `config/creators.yaml` (drama_override block) |
+| — | Clipper-program engagement | **Do NOT enroll in any clipper program** — fair-use-only posture | `config/clipper_programs.yaml`, `config/creators.yaml`, `docs/fair_use_position.md` |
+| — | Top-5 composition | **Keep current top-5** (re-rank candidate at next monthly recompute) | `config/creators.yaml` |
+| 4 | Budget overage from backup warming | **Authorize bump to $240/mo** | (to land in `config/budget.yaml` during Phase 1) |
+| 5 | Seedance MPA cease-and-desist | **Agree** — quarterly re-verify of commercial-use terms | `docs/seedance_access.md` (operator-confirmed note) |
+| 6 | Whop brief capture | **Dropped** — no Whop engagement under fair-use-only posture | `config/clipper_programs.yaml` (informational only) |
+
+Implications of the fair-use-only posture (load-bearing):
+
+- **Compliance is now the SOLE legal defense.** There is no "we have a license" fallback. The Compliance gate must enforce every rule in `docs/fair_use_position.md` "Operational summary" without exception. If the gate cannot enforce a rule, the pipeline pauses publishing.
+- **Strike-risk envelope is higher.** Backup-account warming becomes operationally required, not just defensive — see `docs/backup_warming.md`.
+- **Sketch's economic concern dissolves.** No Whop dependency means his earnings come from ad-rev share on our channels like every other creator's clips; pilot-cadence approach is preserved for the Twitch-supply concern.
+
+## Still-open items (need operator action, not decisions)
+
+| Item | Owner | When |
+|---|---|---|
+| Rename repo `datasciencecoursera` → `agentic-clipper` via GitHub web UI; run `git remote set-url origin <new-url>` | operator | before Phase 1 commits |
+| Submit TikTok Content Posting API audit application | operator | Phase 1 Day 1 (4–8 week lead) |
+| Create Facebook Page (needed by IG Graph API linkage) | operator | Phase 1 Day 1 |
+| Initialize Google Cloud project + YouTube Data API key | operator | Phase 1 Day 1 |
+| Provision Atlas Cloud account + fund $50 starter balance + API key | operator | Phase 1 Day 1 |
+| Resolve Red Flag 3 (Kai Cenat Twitch supply alert) | me, in Phase 1 | implements as Scout "no fresh source in N days" alert |
+| Resolve TikTok/IG data gap before 2026-06-13 recompute | operator decision | approve Social Blade Premium ($4–10/mo) or Playwright scrape |
+
+
 ## TL;DR
 
 Phase 0 finished. Five of seven sections returned actionable decisions; two surfaced material conflicts with the spec that the operator should resolve before code is written. **Recommended posture: do not start Phase 1 scaffolding yet — three of the red flags below want a 5-minute conversation first.**

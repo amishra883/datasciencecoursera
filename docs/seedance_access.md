@@ -1,6 +1,14 @@
 # Seedance 2.0 access — Phase 0.7
 
 > Captured 2026-05-14. Re-verify quarterly per CLAUDE.md "Legal & risk register".
+>
+> **Operator-confirmed risk register item (2026-05-14):** MPA has issued a
+> cease-and-desist against ByteDance over Seedance 2.0 (copyright pushback
+> from major studios). Commercial-use rights are clear today, but Atlas
+> Cloud's and ByteDance's terms could shift abruptly if the dispute
+> escalates. Quarterly re-verification of commercial-use language is
+> mandatory and will be enforced via `make doctor` once Phase 1 ships.
+> Next due: 2026-08-14.
 
 ## Decision
 

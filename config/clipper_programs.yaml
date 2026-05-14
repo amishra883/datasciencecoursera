@@ -2,6 +2,26 @@
 # Capture date: 2026-05-14
 # Re-verify monthly per CLAUDE.md "Legal & risk register"
 #
+# === OPERATOR POSTURE (2026-05-14) ===
+# THIS FILE IS INFORMATIONAL ONLY.
+# The operator chose fair-use-only on 2026-05-14: no clipper programs will be
+# engaged (no Whop signups, no Discord-gated program memberships, no payouts
+# collected). Compliance enforces fair-use rules from docs/fair_use_position.md
+# rather than program-specific rules from this file.
+#
+# Why we keep this file:
+#   1. Monthly re-verification still happens — if a creator's program changes
+#      its terms to FORBID derivative clipping (e.g., requires posting from the
+#      creator's own account only), that's a signal to drop them from the
+#      rotation entirely, fair use or not.
+#   2. If a creator publicly states "I dislike unlicensed clip channels", that
+#      goes here as a risk signal even though we never planned to license.
+#   3. If the operator later reverses the posture, the data is preserved.
+#
+# DO NOT use any payout rate, attribution rule, or exclusivity clause from this
+# file as a license shield. We are not parties to any of these programs.
+# =====================================
+#
 # Methodology notes:
 #   - Primary sources for most creators are Whop / Content Rewards campaign pages,
 #     which return HTTP 403 to WebFetch (Cloudflare-gated). Where we could not

@@ -2,6 +2,15 @@
 
 > Captured 2026-05-14. Re-evaluate quarterly per CLAUDE.md "Legal & risk register". Next review due: 2026-08-14.
 
+## Operator posture (2026-05-14)
+
+**Fair use is now the SOLE legal defense.** On 2026-05-14 the operator chose to operate fair-use-only — no clipper programs engaged, no Whop campaigns joined, no creator-licensing relationships. This document is therefore not the backup defense (as the CLAUDE.md spec originally contemplated, with clipper-program licenses as the primary shield); it is the only defense.
+
+Implications:
+- Compliance is the load-bearing wall. If the gate fails to enforce any rule below, the pipeline pauses publishing — there is no "we have a license" fallback.
+- Strike risk is materially higher than in a licensed posture. Backup accounts and the per-account strike monitor are no longer redundancy; they are operationally required.
+- A creator who publicly objects to unlicensed clip channels is a higher-priority drop signal under this posture (we cannot point at their program enrollment).
+
 ## Bottom line
 
 This operation's fair-use posture rests on **substantive transformative commentary** plus a set of **enforced operational rules** (length cap, commentary ratio, attribution, no music passthrough). Fair use is a defense, not an immunity — even with this posture we expect occasional Content ID claims and we maintain backup accounts to limit blast radius. The posture is strongest against U.S. 17 U.S.C. § 107 and weakest against platform-level enforcement (Content ID, Rights Manager, TikTok copyright tools), which operate independently of the legal doctrine.
