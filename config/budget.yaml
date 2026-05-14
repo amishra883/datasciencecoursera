@@ -1,0 +1,90 @@
+# Phase 1 — Budget allocation
+# Operator authorized cap: $240/mo (2026-05-14, +$40 from spec's $200)
+# Increase absorbs backup-warming infra not in original spec.
+# Read by: Visuals (per-clip cost cap), doctor (monthly burn check),
+# Optimizer (auto-pause priority when projected month-end exceeds cap).
+
+monthly_cap_usd: 240
+currency: USD
+billing_cycle: calendar_month
+
+# Hard kill switch — if monthly external spend exceeds this, the pipeline
+# pauses all paid-tier features regardless of Optimizer state. Set above
+# the cap to allow Optimizer to react before the kill switch fires.
+hard_kill_switch_usd: 260
+
+# Line items (sums to <= monthly_cap_usd)
+line_items:
+  seedance_fast:
+    monthly_budget_usd: 50
+    notes: "~10s/clip x 7 clips/day x 30d at ~$0.022/sec via Atlas Cloud"
+
+  seedance_pro:
+    monthly_budget_usd: 20
+    notes: "High-virality projection clips only; Pro tier escalation"
+
+  elevenlabs_creator:
+    monthly_budget_usd: 22
+    notes: "Selective TTS escalation; default is local Coqui XTTS-v2"
+
+  anthropic_api_buffer:
+    monthly_budget_usd: 40
+    notes: "Sub-agents that run outside Claude Code sessions"
+
+  proxy_pool:
+    monthly_budget_usd: 30
+    notes: "Residential proxies for scraping + backup-account fingerprint separation"
+
+  mvno_phone_lines:
+    monthly_budget_usd: 18
+    notes: "6 lines @ $3/mo (Ultra Mobile PayGo or equivalent real-SIM MVNO) for backup-account phone verification. Added 2026-05-14."
+
+  storage:
+    monthly_budget_usd: 10
+    notes: "Local + offsite S3-compatible backup"
+
+  domain_cloudflare:
+    monthly_budget_usd: 2
+    notes: "Affiliate-link short domain + Cloudflare KV"
+
+  pexels_pixabay:
+    monthly_budget_usd: 0
+    notes: "Free tier; B-roll fallback when Seedance not cost-justified"
+
+  social_analytics:
+    monthly_budget_usd: 8
+    notes: "Social Blade Premium for verified 30d TikTok/IG view aggregates. Pending operator approval per phase0_digest.md open items."
+
+  reserve:
+    monthly_budget_usd: 40
+    notes: "Headroom for one-time setup costs (Android devices ~$200-300 amortized over months) and unexpected line items"
+
+# Per-clip cost caps (Visuals agent enforces; fails closed to /quarantine/)
+per_clip_caps:
+  seedance_seconds_max: 15
+  seedance_cost_usd_max_fast: 0.50    # 15s * $0.022/sec + headroom
+  seedance_cost_usd_max_pro: 4.00     # hero shot escalation ceiling
+  elevenlabs_cost_usd_max: 1.00       # only on threshold escalation
+
+# Virality threshold for Seedance Pro promotion (read by Curator + Visuals)
+pro_tier_promotion:
+  curator_score_min: 0.85
+  projected_views_min: 50000
+  hero_shot_required: true
+  month_to_date_pro_spend_cap_usd: 20   # block further Pro promotions if exceeded
+
+# Auto-pause priority when projected month-end > cap.
+# Optimizer walks this list top-to-bottom, pausing each line item until projection
+# fits the cap. Logged to /data/auto_changes.jsonl with rationale.
+auto_pause_priority:
+  - seedance_pro
+  - elevenlabs_creator
+  - seedance_fast_reduced     # special: cap seedance_fast to 50% of budget
+  - anthropic_api_buffer      # force sub-agents back into Claude Code sessions
+
+# Never auto-pause without explicit operator approval
+never_auto_pause:
+  - proxy_pool                # losing this breaks backup-account fingerprint hygiene
+  - mvno_phone_lines          # losing this could trigger SMS-reverification on backups
+  - storage                   # data loss risk
+  - domain_cloudflare         # affiliate attribution breaks if domain lapses

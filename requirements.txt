@@ -1,0 +1,25 @@
+# agentic-clipper — runtime dependencies
+# Phase 1 scaffold: minimal set so tests run and stubs import.
+# Phase 2 will add the heavy deps (faster-whisper, moviepy, anthropic, etc.)
+# behind their respective agents.
+
+# Config + data
+pyyaml>=6.0
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+
+# === Phase 2 (commented out so Phase 1 imports stay clean) ===
+# anthropic>=0.40            # Writer, Curator LLM judgment
+# faster-whisper>=1.0        # Editor transcription
+# yt-dlp>=2026.3.0           # Editor source ingestion
+# moviepy>=2.0               # Compositor programmatic composition
+# ffmpeg-python>=0.2         # Compositor ffmpeg wrapper
+# google-api-python-client   # YouTube Data API v3 (Scout, Publisher)
+# requests>=2.31             # Atlas Cloud / fal.ai HTTP
+# aiohttp>=3.9               # async HTTP for Publisher / Scout
+# apscheduler>=3.10          # scheduled posting
+# python-dotenv>=1.0         # .env loading
+# playwright>=1.40           # TikTok fallback (only if audit denied)
+# TTS>=0.22                  # Coqui XTTS-v2 (heavy; install separately if needed)

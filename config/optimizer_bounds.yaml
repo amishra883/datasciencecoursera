@@ -1,0 +1,66 @@
+# Phase 1 — Optimizer bounds
+# Read by Optimizer to constrain what it can auto-apply vs. what must be a /proposals/ diff.
+# Per CLAUDE.md "Self-improvement loop".
+
+# Changes the Optimizer can auto-apply (writes to /data/auto_changes.jsonl)
+auto_apply:
+  posting_time_shift:
+    enabled: true
+    max_minutes: 60            # +/- 60 min from current schedule
+    min_data_points: 50        # require >= 50 posted clips before shifting
+    rollback_threshold_pct: 15 # auto-rollback if performance drops > 15%
+    rollback_window_hours: 72
+
+  hashtag_set_rotation:
+    enabled: true
+    bank: config/hashtag_bank.yaml   # pre-approved sets only (created in Phase 1)
+    min_data_points: 30
+
+  caption_style:
+    enabled: true
+    bank:
+      - pop-bold-yellow
+      - shake-on-punch-white
+      - color-shift-cyan
+      - scale-pulse-red
+    min_data_points: 30
+
+  b_roll_density:
+    enabled: true
+    min: 0.2
+    max: 0.6
+    step: 0.05
+    min_data_points: 40
+
+  hook_template_weighting:
+    enabled: true
+    templates_allowed: existing_only   # no new templates auto-introduced
+    weight_min: 0.05                   # never zero out a template (preserves exploration)
+    weight_max: 0.50
+
+# Changes that require human review (Optimizer writes to /proposals/ as diffs)
+human_review_required:
+  - new_persona
+  - new_hook_template
+  - creator_added_or_removed_from_rotation
+  - seedance_pro_threshold_change
+  - budget_allocation_shifts
+  - compliance_rule_changes      # never auto-applied per CLAUDE.md "Legal & risk register"
+  - drama_override_changes       # Adin Ross override is operator-owned; never auto-touched
+
+# Bandit-experiment limits
+experiments:
+  max_concurrent: 3
+  min_clips_per_arm: 50
+  evaluation_window_clips: 100
+  termination_conditions:
+    - winner_p_value_lt: 0.05
+    - max_clips_reached: 500
+    - manual_stop
+
+# Rollback policy
+rollback:
+  auto_rollback_trigger:
+    underperformance_vs_baseline_pct: 15
+    window_hours: 72
+  manual_rollback_command: make rollback CHANGE_ID=<id>

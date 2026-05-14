@@ -1,0 +1,69 @@
+# Phase 1 — Posting schedule
+# Defaults from CLAUDE.md "Posting cadence". Optimizer can shift +/- 60 min
+# per optimizer_bounds.yaml.
+
+timezone: America/New_York   # US Eastern per operator default
+
+platforms:
+  tiktok:
+    posts_per_day: 3
+    times:
+      - "07:00"
+      - "12:00"
+      - "20:00"
+    weekend_boost:
+      enabled: true
+      posts_per_day: 4
+      extra_time: "23:00"
+
+  instagram_reels:
+    posts_per_day: 2
+    times:
+      - "11:00"
+      - "19:00"
+
+  youtube_shorts:
+    posts_per_day: 2
+    times:
+      - "12:00"
+      - "21:00"
+
+# Total: 7 posts/day weekday, 8 posts/day weekend
+# Each clip reformatted per platform (aspect ratio, caption density, hashtag set)
+# rather than producing separate pipelines.
+
+reformatting:
+  per_platform:
+    tiktok:
+      aspect_ratio: "9:16"
+      max_duration_s: 58
+      caption_density: high       # word-level, animated emphasis
+      hashtags_count: [3, 5]      # min, max
+    instagram_reels:
+      aspect_ratio: "9:16"
+      max_duration_s: 58
+      caption_density: medium
+      hashtags_count: [5, 10]
+    youtube_shorts:
+      aspect_ratio: "9:16"
+      max_duration_s: 58
+      caption_density: medium
+      hashtags_count: [2, 4]
+      title_must_contain: "#Shorts"
+
+# Quota-aware throttling (read from posting_apis.md)
+quota_guards:
+  youtube:
+    api: youtube_data_api_v3
+    daily_quota_units: 10000
+    cost_per_upload_units: 1600
+    max_uploads_per_day: 6        # 9600 units; leaves headroom for read calls
+  tiktok:
+    api: tiktok_content_posting_api
+    mode_pre_audit: SELF_ONLY
+    max_uploads_per_day_pre_audit: 5
+    fallback: playwright_tiktok_studio_desktop
+  instagram:
+    api: instagram_graph_api
+    daily_post_limit: 50          # current limit; queryable via content_publishing_limit
+    reels_max_duration_s: 90

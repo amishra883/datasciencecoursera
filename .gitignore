@@ -1,0 +1,40 @@
+# agentic-clipper
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data
+data/main.db
+data/main.db-wal
+data/main.db-shm
+data/clips/raw/*
+data/clips/output/*
+data/generated_cache/*
+data/quarantine/*
+data/experiments/*
+data/learnings.jsonl
+data/auto_changes.jsonl
+data/trending.md
+data/playbook.md
+data/anti-patterns.md
+!data/clips/raw/.gitkeep
+!data/clips/output/.gitkeep
+!data/generated_cache/.gitkeep
+!data/quarantine/.gitkeep
+!data/experiments/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
