@@ -1,0 +1,119 @@
+# Phase 0 — Avatar reaction library
+# Read by Writer (shot list emission) and Visuals (Seedance prompt assembly).
+# Each reaction maps to a tested Seedance prompt template once a provider is
+# selected and the reference image is generated. Templates here are PLACEHOLDERS
+# pending the Phase 1 prompt-tuning pass.
+
+# Conventions:
+# - All prompts are written assuming the chosen avatar reference image is
+#   passed via reference_image_url and the locked seed from
+#   /config/avatars/README.md.
+# - Length is the target generation duration in seconds; Visuals enforces.
+# - tier defaults to "fast" unless a hero-shot escalation is in effect.
+# - All reactions read as cartoon-coded performance, NOT photoreal acting.
+
+reactions:
+  - id: jaw_drop
+    description: Jaw literally drops, eyes bug out, body freezes.
+    length_s: 2.5
+    tier: fast
+    prompt_template: |
+      The character's jaw drops cartoonishly low, eyes pop out wide, body
+      frozen in shock. Holds the pose for half a second then snaps back.
+      Saturday-morning-cartoon style, exaggerated. Locked reference image,
+      consistent character.
+    use_when: ["unbelievable_play", "shocking_reveal", "monster_hit"]
+
+  - id: exaggerated_double_take
+    description: Looks away, snaps back fast with disbelief.
+    length_s: 2.0
+    tier: fast
+    prompt_template: |
+      The character glances offscreen casually, then whip-pans back to
+      camera with eyes wide and mouth open in a "wait, WHAT?" double-take.
+      Cartoon-style head movement. Locked reference image.
+    use_when: ["unexpected_outcome", "lore_recall", "callback_reveal"]
+
+  - id: head_explosion_stinger
+    description: Head pops in a stylized cartoon explosion (mind-blown).
+    length_s: 1.5
+    tier: fast
+    prompt_template: |
+      The character's head visibly "explodes" in a cartoon mushroom of
+      stars and squiggles, smoke rising. Reassembles in the next frame.
+      No realistic gore. Locked reference image, no real-face reference.
+    use_when: ["mind_blown_moment", "150_iq_play", "twist_ending"]
+
+  - id: comically_slow_blink
+    description: Long, exaggerated blink registering "I cannot process this".
+    length_s: 2.0
+    tier: fast
+    prompt_template: |
+      The character executes one extremely slow, deliberate blink while
+      staring directly at the camera. Deadpan but escalating. Saturday-morning
+      cartoon timing. Locked reference image.
+    use_when: ["bewilderment", "what_just_happened", "comedic_pause"]
+
+  - id: dramatic_point
+    description: Stabs a finger toward something onscreen with theatrical force.
+    length_s: 1.5
+    tier: fast
+    prompt_template: |
+      The character thrusts a pointing finger forward dramatically toward
+      the camera/scene, eyebrows up, mouth in an "AHA!" shape. Cartoon
+      motion-blur lines behind the gesture. Locked reference image.
+    use_when: ["call_out", "stat_card_intro", "objection_moment"]
+
+  - id: faint_and_recover
+    description: Falls backward in mock-faint, springs back upright.
+    length_s: 3.0
+    tier: fast
+    prompt_template: |
+      The character throws hands up, falls backward off-screen as if fainting,
+      then immediately springs back into frame with hair tousled. Slapstick
+      timing. Locked reference image.
+    use_when: ["overwhelming_moment", "unbearable_cringe", "out_of_pocket"]
+
+  - id: deadpan_with_fire
+    description: Calm face while everything burns. Use sparingly per spec.
+    length_s: 2.5
+    tier: fast
+    prompt_template: |
+      The character sits dead-center, perfectly calm expression, while
+      cartoon flames lick the edges of the frame. Slight head tilt, no
+      smile. "This is fine"-coded. Locked reference image.
+    use_when: ["chaos_acceptance"]
+    usage_constraint: max_once_per_8_clips   # don't overuse — diminishing returns
+
+  - id: spit_take
+    description: Pretends to drink, sprays in shock.
+    length_s: 2.0
+    tier: fast
+    prompt_template: |
+      The character takes a sip from a stylized cup, then sprays the drink
+      forward in a comedic burst at the moment of reaction. Cartoon spray
+      effect, no realistic liquid. Locked reference image.
+    use_when: ["scandalous_reveal", "spicy_take_setup"]
+
+  - id: monocle_pop
+    description: Comically formal monocle drops in shock.
+    length_s: 1.5
+    tier: fast
+    prompt_template: |
+      The character is briefly drawn wearing a stylized monocle that pops
+      out and dangles. Eyebrow raised. Old-cartoon vibe. Locked reference image.
+    use_when: ["highbrow_take_setup", "fancy_observation", "well_i_never_moment"]
+
+# Sync rule (read by Compositor): place reactions on punch words/moments
+# identified by Writer's punch_beats array, not at fixed intervals.
+sync_rules:
+  alignment: punch_beats   # Writer-emitted timestamps
+  pre_roll_ms: 100         # avatar starts reacting 100ms before the punch lands
+  post_roll_ms: 200        # holds 200ms past the punch for the laugh
+
+# Compliance rules for ALL reactions (enforced by Compliance agent)
+compliance:
+  reference_image_must_be_non_human_real: true
+  no_likeness_of_source_creator: true
+  energy_floor_enforced: true   # neutral output → re-generate
+  ai_content_label_required: true   # platform-specific labels applied by Publisher
